@@ -21,12 +21,6 @@ import java.security.KeyStore;
 public class App {
 
 
-  public App() {
-
-    // TODO Auto-generated constructor stub
-
-  }
-
   public static String getEnv(String envVar, String defVal) {
     String val = System.getenv(envVar);
 
@@ -74,7 +68,7 @@ public class App {
       String CERT_PASSWORD = loadSecretFromFile("PV_IDENTITY_KEYSTORE_PASS_FILE",
           "keystore_pass.txt","pa55wordpa55word");
       String TRUST_PASSWORD = loadSecretFromFile("PV_IDENTITY_TRUSTSTORE_PASS_FILE",
-          "truststore_pass.txt",CERT_PASSWORD);
+          "truststore_pass.txt","");
 
 
       KeyStore identityKeyStore = KeyStore.getInstance("jks");
@@ -88,10 +82,15 @@ public class App {
       KeyStore trustKeyStore = KeyStore.getInstance("jks");
 
       FileInputStream trustKeyStoreFile =
-          new FileInputStream(getEnv("PV_IDENTITY_TRUSTSTORE_FILE","certs/srv-truststore.jks"));
+          new FileInputStream(getEnv("PV_TRUSTSTORE_FILE","certs/srv-truststore.jks"));
 
-      trustKeyStore.load(trustKeyStoreFile, (TRUST_PASSWORD).toCharArray());
+      if ("".equals(TRUST_PASSWORD)||TRUST_PASSWORD == null) {
+        trustKeyStore.load(trustKeyStoreFile, null);
+      }
+      else{
+        trustKeyStore.load(trustKeyStoreFile, (TRUST_PASSWORD).toCharArray());
 
+      }
       SSLContext sslContext = SSLContexts.custom()
 
           // load identity keystore
