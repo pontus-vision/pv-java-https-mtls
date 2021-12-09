@@ -71,21 +71,24 @@ public class App {
     try {
 
       String CERT_ALIAS = getEnv("PV_IDENTITY_KEYSTORE_CERT_ALIAS", "certificate");
-      String CERT_PASSWORD = loadSecretFromFile("PV_IDENTITY_KEYSTORE_PASS_FILE","keystore_pass.txt","pa55wordpa55word");
+      String CERT_PASSWORD = loadSecretFromFile("PV_IDENTITY_KEYSTORE_PASS_FILE",
+          "keystore_pass.txt","pa55wordpa55word");
       String TRUST_PASSWORD = loadSecretFromFile("PV_IDENTITY_TRUSTSTORE_PASS_FILE",
-          "keystore_pass.txt",CERT_PASSWORD);
+          "truststore_pass.txt",CERT_PASSWORD);
 
 
       KeyStore identityKeyStore = KeyStore.getInstance("jks");
 
-      FileInputStream identityKeyStoreFile = new FileInputStream("certs/keystore.jks");
+      FileInputStream identityKeyStoreFile =
+          new FileInputStream(getEnv("PV_IDENTITY_KEYSTORE_FILE","certs/keystore.jks"));
 
       identityKeyStore.load(identityKeyStoreFile, CERT_PASSWORD.toCharArray());
 
 
       KeyStore trustKeyStore = KeyStore.getInstance("jks");
 
-      FileInputStream trustKeyStoreFile = new FileInputStream("certs/truststore.jks");
+      FileInputStream trustKeyStoreFile =
+          new FileInputStream(getEnv("PV_IDENTITY_TRUSTSTORE_FILE","certs/srv-truststore.jks"));
 
       trustKeyStore.load(trustKeyStoreFile, (TRUST_PASSWORD).toCharArray());
 
@@ -97,7 +100,8 @@ public class App {
 
           // load trust keystore
 
-          .loadTrustMaterial(trustKeyStore, (chain, authType) -> true)
+//          .loadTrustMaterial(trustKeyStore, (chain, authType) -> true)
+          .loadTrustMaterial(trustKeyStore,null)
 
           .build();
 
